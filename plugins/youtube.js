@@ -17,6 +17,10 @@ const init = () => {
     }
 }
 
+const run = async () => {
+    return await checkComments()
+}
+
 const checkComments = async (nextPageToken, items) => {
     items = items || []
     const opt = {
@@ -25,13 +29,10 @@ const checkComments = async (nextPageToken, items) => {
             "snippet,replies"
         ],
         videoId: process.env.YOUTUBE_VIDEO_ID,
-        order: "time",
-        maxResults: 1
+        order: "time"
     }
     if (nextPageToken) opt.pageToken = nextPageToken
     const result = await service.commentThreads.list(opt)
-
-    if (result.data && result.data.items) logger.info('API request failed')
 
     const newItems = result.data.items.map(item => {
         const id = 'youtube/' + item.snippet.topLevelComment.id
@@ -39,7 +40,6 @@ const checkComments = async (nextPageToken, items) => {
         const comment = item.snippet.topLevelComment.snippet
 
         const content = format(comment.authorDisplayName, comment.textDisplay)
-        console.log(content)
         return {
             id,
             content
@@ -56,10 +56,12 @@ const checkComments = async (nextPageToken, items) => {
 const format = (username, text) => {
     const date = moment().format("MMM D YYYY, h:mmA");
 
-    return emojiText.convert(`${username}\n${date}\n--------------------------\n${text}`)
+    return emojiText.convert(`${username}\n${date}\n--------------------------\n${text}`, {
+        delimiter: ':'
+    })
 }
 
 module.exports = {
     init,
-    checkComments
+    run
 }

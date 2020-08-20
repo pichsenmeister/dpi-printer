@@ -2,6 +2,8 @@ const fs = require('fs')
 const printer = require('./printer')
 const logger = require('./logger')
 const youtube = require('./plugins/youtube')
+const slack = require('./plugins/slack')
+const { timeStamp } = require('console')
 const INTERVAL_SEC = 5
 
 const init = () => {
@@ -9,12 +11,22 @@ const init = () => {
     fs.mkdirSync('files')
   }
   youtube.init()
+  slack.init()
 }
 
 const run = async () => {
-  const items = await youtube.checkComments()
+  const itemsYT = await youtube.run()
+  const itemsSlack = await slack.run()
+
+  const items = []
+  items.push(...itemsYT)
+  items.push(...itemsSlack)
+
   const promises = items.map(item => {
-    return printer.print(item.id, item.content)
+    if (process.env.PRINT)
+      return printer.print(item.id, item.content)
+    else
+      console.log(`printing ${item.id}\n`, item.content)
   })
   return await Promise.all(promises)
 }
@@ -27,5 +39,5 @@ const run = async () => {
     } catch (err) {
       logger.error(err)
     }
-  }, INTERVAL_SEC*1000)
+  }, INTERVAL_SEC * 1000)
 })()
