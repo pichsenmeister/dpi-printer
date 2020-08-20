@@ -2,6 +2,7 @@ require('dotenv').config()
 const moment = require('moment')
 const fs = require('fs')
 const { google } = require('googleapis')
+const emojiText = require('emoji-text')
 const logger = require('../logger')
 
 const service = google.youtube('v3')
@@ -55,7 +56,7 @@ const checkComments = async (nextPageToken, items) => {
 const format = (username, text) => {
     const date = moment().format("MMM D YYYY, h:mmA");
 
-    return `${username} - ${date}:\n----------------------\n${text}`
+    return emojiText.convert(`${username}\n${date}\n--------------------------\n${text}`)
 }
 
 module.exports = {

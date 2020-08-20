@@ -2,7 +2,7 @@ const fs = require('fs')
 const printer = require('./printer')
 const logger = require('./logger')
 const youtube = require('./plugins/youtube')
-const INTERVAL_SEC = 1
+const INTERVAL_SEC = 5
 
 const init = () => {
   if (!fs.existsSync('files')) {
@@ -21,11 +21,11 @@ const run = async () => {
 
 (async () => {
   init()
-  // setInterval(async () => {
-  try {
-    await run()
-  } catch (err) {
-    logger.error(err)
-  }
-  // }, INTERVAL_SEC*1000)
+  setInterval(async () => {
+    try {
+      await run()
+    } catch (err) {
+      logger.error(err)
+    }
+  }, INTERVAL_SEC*1000)
 })()
